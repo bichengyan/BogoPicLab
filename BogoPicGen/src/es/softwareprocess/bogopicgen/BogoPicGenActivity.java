@@ -87,21 +87,28 @@ public class BogoPicGenActivity extends Activity {
 	}
 
 	private Bitmap ourBMP;
+	private String ourSTR;
 
 	private void setBogoPic() {
 		// TODO: Show a toast with message "Generating Photo"
-		
+		Toast.makeText(this, "Generating Photo", Toast.LENGTH_LONG).show();
 		
 		// TODO: Get a reference to the image button
-		
+		ImageButton button = (ImageButton) findViewById(R.id.TakeAPhoto);
 		
 		// Generate a bogopic
 		ourBMP = BogoPicGen.generateBitmap(400, 400);
 		
 		// TODO: Assign the bogopic to the button with setImageBitmap
+		button.setImageBitmap(ourBMP);
 		
+		//Generate a random String
+		StringGen strGen = new StringGen();
+		ourSTR = strGen.randomString();
+		Toast.makeText(this, "Random String: " + ourSTR + "",
+				Toast.LENGTH_LONG).show();
 	}
-
+	
 	// Call this to accept
 	private void processIntent(boolean cancel) {
 		Intent intent = getIntent();
@@ -112,13 +119,21 @@ public class BogoPicGenActivity extends Activity {
 		try {	
 			if (intent.getExtras() != null) {
 				// TODO: If cancelled, show a toast, set result to RESULT_CANCELED, finish and return 
-				
+				if (cancel){
+					Toast.makeText(this, "Canceling Photo", Toast.LENGTH_LONG).show();
+					setResult(RESULT_CANCELED);
+					finish();
+					return;
+				}
 				
 				// If accepted save the picture
-				File intentPicture = getPicturePath(intent);
+				File intentPicture = getPicturePath(intent);			
 				saveBMP(intentPicture, ourBMP);
+				intent.putExtra("RanStr", ourSTR.toString());
 				
 				// TODO: set result to RESULT_OK
+				setResult(RESULT_OK,intent);
+				
 				
 			} else {
 				Toast.makeText(this, "Photo Cancelled: No Reciever?",
@@ -148,5 +163,4 @@ public class BogoPicGenActivity extends Activity {
 		Uri uri = (Uri) intent.getExtras().get(MediaStore.EXTRA_OUTPUT);
 		return new File(uri.getPath());
 	}
-
 }

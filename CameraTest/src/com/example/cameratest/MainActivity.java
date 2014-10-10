@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -40,11 +41,13 @@ public class MainActivity extends Activity {
 	}
 
 	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+	private static final int CAPTURE_STRING_ACTIVITY_REQUEST_CODE = 50;
 
 	public void takeAPhoto() {
 		// TODO: Create an intent with the action
 		// MediaStore.ACTION_IMAGE_CAPTURE
-		
+		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		Intent i = getIntent();
 		// ComponentName cn = new ComponentName("es.softwareprocess.bogopicgen",
 		// "es.softwareprocess.bogopicgen.BogoPicGenActivity");
 		// ComponentName cn = new ComponentName("com.android.camera",
@@ -64,14 +67,13 @@ public class MainActivity extends Activity {
 				+ String.valueOf(System.currentTimeMillis()) + ".jpg";
 		File imageFile = new File(imageFilePath);
 		imageFileUri = Uri.fromFile(imageFile);
-
 		// TODO: Put in the intent in the tag MediaStore.EXTRA_OUTPUT the URI
-		
+		intent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
 		// TODO: Start the activity (expecting a result), with the code
 		// CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE
-		
+		startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
 	}
-
+	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO: Handle the results from CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE
 		
@@ -82,6 +84,22 @@ public class MainActivity extends Activity {
 		//		button.setImageDrawable(Drawable.createFromPath(imageFileUri.getPath()));
 		// When the result is CANCELLED, set text "Photo canceled" in the status
 		// Otherwise, set text "Not sure what happened!" with the resultCode
-		
+		if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE){
+			
+			TextView tv = (TextView) findViewById(R.id.status);
+			if (resultCode == RESULT_OK){
+				//String str = (String) data.getStringExtra("RanStr");
+				//Toast.makeText(this, "Random String: "+ str +"", Toast.LENGTH_LONG).show();
+				tv.setText("Photo OK!");
+				ImageButton button = (ImageButton) findViewById(R.id.TakeAPhoto);
+				button.setImageDrawable(Drawable.createFromPath(imageFileUri.getPath()));
+			}
+			else if (resultCode == RESULT_CANCELED) {
+				tv.setText("Photo Canceled!");
+			}
+			else {
+				tv.setText("Have no idea what happened!");
+			}
+		}	
 	}
 }
